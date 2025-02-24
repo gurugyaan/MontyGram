@@ -1,0 +1,1 @@
+aws s3 mb s3://montygram-assets --endpoint-url=http://localhost:4566

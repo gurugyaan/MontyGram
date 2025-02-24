@@ -1,0 +1,27 @@
+{
+  "version": "2.0",
+  "app_name": "montygram",
+  "stages": {
+    "local": {
+      "api_gateway_stage": "local-api",
+      "environment_variables": {
+        "ENV": "local",
+        "AWS_REGION": "us-east-1"
+      }
+    },
+    "prod": {
+      "api_gateway_stage": "prod-api",
+      "iam_rle_arn": "",
+      "lambda_functions": {
+        "api_handler": {
+          "lambda_memory_size": 2048,
+          "lambda_timeout": 60
+        }
+      },
+      "environment_variables": {
+        "ENV": "prod",
+        "AWS_REGION": "us-east-1"
+      }
+    }
+  }
+}
