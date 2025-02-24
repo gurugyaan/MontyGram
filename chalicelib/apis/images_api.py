@@ -37,26 +37,13 @@ def upload_image():
 
 @images_api.route('/api/v1/download/id/{image_id}', methods=['GET'])
 def view_or_download_image_by_id(image_id):
-    image_details = ImageHelper().get_image(user_id, image_id)
-    bucket_name = images_api.current_request.query_params.get('bucket_name')
-    image_key = images_api.current_request.query_params.get('image_key')
-    if not bucket_name or not image_key:
-        return {'error': 'bucket_name and image_key are required'}, 400
-
     try:
-        # Download the image from S3
-        response = s3.get_object(Bucket=bucket_name, Key=image_key)
-        image_data = response['Body'].read()
-
-        # Return the image as a response
-        return Response(
-            body=image_data,
-            status_code=200,
-            headers={
-                'Content-Type': response['ContentType'],
-                'Content-Disposition': f'attachment; filename="{os.path.basename(image_key)}"'
-            }
-        )
+        image_data, content_type = ImageHelper().download_image(user_id, image_id)
+        headers = {
+            'Content-Type': content_type,
+            'Content-Disposition': f'attachment; filename="{os.path.basename(f"{image_id}.png")}"'
+        }
+        return Response(body=image_data, status_code=200, headers=headers)
     except Exception as err:
         return Response(status_code=500, body={"error": str(err)})
 

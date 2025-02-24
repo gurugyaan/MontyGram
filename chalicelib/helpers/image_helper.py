@@ -41,8 +41,16 @@ class ImageHelper:
     def fetch_all_images_for_user(self, user_id):
         return ImageDetailModel.fetch_all_images_for_user(user_id)
 
+
     def get_image(self, user_id, image_id):
         return ImageDetailModel.fetch_image_by_id(user_id, image_id)
+
+    @staticmethod
+    def download_image(user_id, image_id):
+        s3_key = f"/{user_id}/{image_id}.png"
+        response = AWSS3(S3_bucket).s3_client.get_object(Bucket=S3_bucket, Key=s3_key)
+        image_data = response['Body'].read()
+        return image_data, response['ContentType']
 
     def delete_image(self, user_id, image_id):
         # image_details = self.get_image(user_id, image_id)
