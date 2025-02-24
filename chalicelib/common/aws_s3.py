@@ -5,7 +5,7 @@ import tempfile
 from datetime import timedelta
 
 
-class S3Manager:
+class AWSS3:
     def __init__(self, bucket_name, region_name='us-east-1', use_localstack=False):
         self.bucket_name = bucket_name
         self.region_name = region_name
@@ -78,4 +78,13 @@ class S3Manager:
             return response
         except ClientError as e:
             print(f"Client error: {e}")
+            return None
+
+    def delete_s3_object(self, object_key):
+        try:
+            response = self.s3_client.delete_object(Bucket=self.bucket_name, Key=object_key)
+            print(f"Deleted {object_key} from {self.bucket_name}.")
+            return response
+        except ClientError as e:
+            print(f"Error deleting object: {e}")
             return None

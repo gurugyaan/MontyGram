@@ -35,8 +35,9 @@ def upload_image():
     except Exception as err:
         return Response(status_code=500, body={"error": str(err)})
 
-@images_api.route('/api/v1/image/download', methods=['GET'])
-def download_image():
+@images_api.route('/api/v1/image/download/{image_id}', methods=['GET'])
+def download_image(image_id):
+    image_details = ImageHelper().get_image(user_id, image_id)
     image_name = images_api.current_request.query_params.get('image_name')
     if not image_name:
         return {'error': 'image_name is required'}, 400
@@ -63,6 +64,7 @@ def download_image():
 
 @images_api.route('/api/v1/view_image/id/{image_id}', methods=['GET'])
 def view_image_by_id(image_id):
+    image_details = ImageHelper().get_image(user_id, image_id)
     bucket_name = images_api.current_request.query_params.get('bucket_name')
     image_key = images_api.current_request.query_params.get('image_key')
     if not bucket_name or not image_key:
@@ -82,9 +84,18 @@ def view_image_by_id(image_id):
                 'Content-Disposition': f'attachment; filename="{os.path.basename(image_key)}"'
             }
         )
+    except Exception as err:
+        return Response(status_code=500, body={"error": str(err)})
 
-    except NoCredentialsError:
-        return {'error': 'Credentials not available'}, 403
-    except ClientError as e:
-        return {'error': str(e)}, 400
 
+
+@images_api.route('/api/v1/delete/image/{image_id}', methods=['GET'])
+def delete_image_by_id(image_id):
+    try:
+        is_deleted = ImageHelper().delete_image(user_id, image_id)
+        if is_deleted:
+            return Response(status_code=200, body={"message": "Image deleted successfully!"})
+        else:
+            return Response(status_code=400, body={"error": "Failed to delete image!"})
+    except Exception as err:
+        return Response(status_code=500, body={"error": str(err)})

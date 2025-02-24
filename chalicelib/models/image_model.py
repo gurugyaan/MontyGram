@@ -50,3 +50,8 @@ class ImageDetailModel:
     def fetch_all_images_for_user(cls, user_id):
         user_images = AWSDynamoDB(cls.table_name).fetch_records_by_pk(user_id, cls.pk)
         return user_images
+
+    @classmethod
+    def fetch_image_by_id(cls, user_id, image_id):
+        image_details = AWSDynamoDB(cls.table_name).fetch_record_by_pk_sk(user_id, image_id, cls.pk, cls.sk)
+        return image_details

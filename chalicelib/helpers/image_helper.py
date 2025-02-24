@@ -2,9 +2,10 @@ import os
 import uuid
 
 from PIL import Image
+from chalicelib.common.aws_s3 import AWSS3
 from chalicelib.models.image_model import ImageDetailModel
 
-
+S3_bucket = "montygram-assets"
 class ImageHelper:
     def __init__(self):
         self.tmp_location = "/tmp/"
@@ -39,4 +40,15 @@ class ImageHelper:
 
     def fetch_all_images_for_user(self, user_id):
         return ImageDetailModel.fetch_all_images_for_user(user_id)
+
+    def get_image(self, user_id, image_id):
+        return ImageDetailModel.fetch_image_by_id(user_id, image_id)
+
+    def delete_image(self, user_id, image_id):
+        # image_details = self.get_image(user_id, image_id)
+        s3_key = f"/{user_id}/{image_id}.png"
+        AWSS3(S3_bucket).delete_s3_object(s3_key)
+        return ImageDetailModel.delete_image(user_id, image_id)
+
+
 
