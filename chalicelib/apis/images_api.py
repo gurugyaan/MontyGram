@@ -35,35 +35,8 @@ def upload_image():
     except Exception as err:
         return Response(status_code=500, body={"error": str(err)})
 
-@images_api.route('/api/v1/image/download/{image_id}', methods=['GET'])
-def download_image(image_id):
-    image_details = ImageHelper().get_image(user_id, image_id)
-    image_name = images_api.current_request.query_params.get('image_name')
-    if not image_name:
-        return {'error': 'image_name is required'}, 400
-
-    tmp_image_path = os.path.join('/tmp', image_name)
-
-    # Check if the image exists in the /tmp directory
-    if not os.path.exists(tmp_image_path):
-        return {'error': 'Image not found in /tmp'}, 404
-
-    # Read the image file
-    with open(tmp_image_path, 'rb') as file:
-        image_data = file.read()
-
-    # Return the image as a response
-    return Response(
-        body=image_data,
-        status_code=200,
-        headers={
-            'Content-Type': 'image/jpeg',  # Adjust content type based on your image format
-            'Content-Disposition': f'attachment; filename="{image_name}"'
-        }
-    )
-
-@images_api.route('/api/v1/view_image/id/{image_id}', methods=['GET'])
-def view_image_by_id(image_id):
+@images_api.route('/api/v1/download/id/{image_id}', methods=['GET'])
+def view_or_download_image_by_id(image_id):
     image_details = ImageHelper().get_image(user_id, image_id)
     bucket_name = images_api.current_request.query_params.get('bucket_name')
     image_key = images_api.current_request.query_params.get('image_key')
