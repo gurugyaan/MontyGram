@@ -4,7 +4,7 @@ import tempfile
 
 
 class AWSS3:
-    def __init__(self, bucket_name, region_name='us-east-1', use_localstack=False):
+    def __init__(self, bucket_name, region_name='us-east-1'):
         self.bucket_name = bucket_name
         self.region_name = region_name
         self.use_localstack = True if os.getenv("ENV") == "local" else False
