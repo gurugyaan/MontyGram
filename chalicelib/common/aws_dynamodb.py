@@ -6,22 +6,21 @@ class AWSDynamoDB:
     def __init__(self, table_name):
         self.table_name = table_name
         self.region_name = os.getenv("AWS_REGION")
-        self.localstack = True if os.getenv("ENV") == "local" else False
+        self.use_localstack = True if os.getenv("ENV") == "local" else False
         print(os.getenv("ENV"))
-        if self.localstack:
+        if self.use_localstack:
             # Use LocalStack endpoint
             self.dynamodb = self._setup_localstack()
         else:
             # Use AWS DynamoDB
             self.dynamodb = boto3.resource('dynamodb', region_name=self.region_name)
-
         self.table = self.dynamodb.Table(table_name)
 
     def _setup_localstack(self):
         local_dynamodb = boto3.resource(
                 'dynamodb',
                 endpoint_url='http://localhost:4566',
-                region_name=self.region_name,
+                region_name='us-east-1',
                 aws_access_key_id='test',
                 aws_secret_access_key='test'
             )

@@ -1,4 +1,6 @@
 import os
+import uuid
+
 from PIL import Image
 from chalicelib.models.image_model import ImageDetailModel
 
@@ -8,22 +10,31 @@ class ImageHelper:
         self.tmp_location = "/tmp/"
         pass
 
-
-    def process_uploaded_image(self, raw_body, user):
-        file_path = os.path.join('/tmp', 'uploaded_image.png')
-
-        # Write the raw body to a file
-        with open(file_path, 'wb') as f:
-            f.write(raw_body)
+    # Renames the
+    def get_image_name(self, image_id):
         return True
 
-    def get_image_metadata(self, file_name):
-        file_path = self.tmp_location + file_name
+
+    def process_uploaded_image(self, raw_body, user_id):
+        image_id = str(uuid.uuid4())
+        file_path = os.path.join(self.tmp_location, f'{image_id}.png')
+        with open(file_path, 'wb') as f:
+            f.write(raw_body)
+        image_metadata = self.get_image_metadata(file_path)
+        image_details = {"image_id": image_id, "user_id": user_id}
+        print(image_metadata)
+        image_metadata.update(image_details)
+        is_uploaded = ImageDetailModel(**image_metadata).save()
+        return is_uploaded
+
+    def get_image_metadata(self, file_path):
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"The file {file_path} does not exist.")
-
         with Image.open(file_path) as img:
-            metadata = img.info
+            image_width, image_height = img.size
+
+        metadata = {"image_format": img.format, "image_mode": img.mode,
+                    "image_width": image_width, "image_height": image_height}
         return metadata
 
     def fetch_all_images_for_user(self, user_id):

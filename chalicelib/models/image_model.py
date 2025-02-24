@@ -1,3 +1,4 @@
+import time
 from dataclasses import dataclass
 from typing import ClassVar, Optional
 from chalicelib.common.aws_dynamodb import AWSDynamoDB
@@ -12,12 +13,23 @@ class ImageDetailModel:
     # Instance Variables (Will be Saved in the Database)
     user_id: str
     image_id: str
-    created_timestamp: int
-    is_deleted: bool
-    deleted_timestamp: int
+    image_format: str
+    image_mode: str
+    image_width: int
+    image_height: int
+    created_timestamp: Optional[int] = -1
+    is_deleted: Optional[bool] = False
+    deleted_timestamp: Optional[int] = -1
 
     def __post_init__(self):
         self.validate()
+        self._add_additional_info()
+
+    def _add_additional_info(self):
+        self.created_timestamp = int(time.time())
+        self.deleted_timestamp = -1
+        is_deleted = False
+
 
     def validate(self):
         if not self.user_id:
@@ -26,7 +38,13 @@ class ImageDetailModel:
             raise ValueError("Image Id Cannot be empty")
 
     def save(self):
+        print(self.__dict__)
         return AWSDynamoDB(self.table_name).insert_record(self.__dict__)
+
+    @classmethod
+    def delete_image(cls, user_id, image_id):
+        return AWSDynamoDB(cls.table_name).delete_record(user_id, image_id, cls.pk, cls.sk)
+
 
     @classmethod
     def fetch_all_images_for_user(cls, user_id):

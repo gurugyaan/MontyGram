@@ -5,7 +5,7 @@ from chalicelib.helpers.image_helper import ImageHelper
 
 
 images_api = Blueprint(__name__)
-accepted_types = ['image/png']
+accepted_types = ['image/png', 'multipart/form-data', 'image/jpeg']
 
 #Assuming we will have multiple users in this project and using one specific user for dev (defined below)
 #Ideally the user id will be retrieved from the auth flow (JWT token) after successfull validation.
